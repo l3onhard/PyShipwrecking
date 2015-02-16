@@ -1,14 +1,20 @@
+# importing functions
 from random import randint
 from math import ceil
 
+# letting the player choose the size of the board
 n_rows = int(raw_input("Number of rows:"))
 n_cols = int(raw_input("Number of columns:"))
+
+# letting the player choose the number of battleships
 n_ships = 0
 while n_ships >= n_rows * n_cols or n_ships <= 0:
     n_ships = int(raw_input("Number of battleships (1 - %s):" % ((n_rows * n_cols) - 1)))
+
+# calculating the number of turns
 n_turns = int(ceil(((float(n_ships) / float((n_rows * n_cols) - 1)) ** 0.5) * (n_rows * n_cols)))
 
-# creating the board:
+# generating the board
 board = []
 row_range = range(n_rows)
 col_range = range(n_cols)
@@ -26,12 +32,12 @@ board_pc = []
 for x in row_range:
     board_pc.append(["#"] * n_cols)
 
-# begining the game:
+# beginning the game
 print "Let's play Battleship!"
 print "You have %s turns." % (n_turns)
 print_board(board)
 
-# setting the ships:
+# generating the ships
 def random_row(board_range):
     return randint(0, len(row_range) - 1)
 def random_col(board_range):
@@ -45,7 +51,7 @@ for ship in range(n_ships):
         ship_col = random_col(col_range)
     board_pc[ship_row][ship_col] = "X"
 
-# The Game loop with x turns:
+# looping through the turns
 turn = 0
 ships_left = n_ships
 while turn < n_turns:
