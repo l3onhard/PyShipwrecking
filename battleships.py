@@ -52,14 +52,36 @@ for ship in range(n_ships):
         ship_col = random_col(col_range)
     board_pc[ship_row][ship_col] = "X"
 
-# looping through the turns
+# game-play objects and functions
 turn = 0
+
 ships_left = n_ships
-while turn < n_turns:
+
+def print_turn():
     print ""
     print ">>>>>>>>>> Turn %s <<<<<<<<<<" % (turn + 1)
+
+def request_guess():
+    global guess_row
+    global guess_col
     guess_row = int(raw_input("Guess Row (1 - %s):" % (n_rows))) - 1
     guess_col = int(raw_input("Guess Col (1 - %s):" % (n_cols))) - 1
+
+def hit_or_miss():
+    if (board_pc[guess_row][guess_col] == "X"):
+        global ships_left
+        ships_left -= 1
+        if ships_left > 0:
+            print "You sunk one of my battleships!"
+            board[guess_row][guess_col] = "X"
+            board_pc[guess_row][guess_col] = "O"
+            print_board(board)
+    else:
+        print "You missed my battleships!"
+        board[guess_row][guess_col] = "O"
+        print_board(board)
+
+def check_guess():
     if (guess_row not in row_range)\
     or (guess_col not in col_range):
         print "Oops, that's not even in the ocean."
@@ -67,25 +89,22 @@ while turn < n_turns:
     or (board[guess_row][guess_col] == "X"):
         print "You guessed that one already."
     else:
+        global turn
         turn += 1
-        if (board_pc[guess_row][guess_col] == "X"):
-            ships_left -= 1
-            if ships_left > 0:
-                print "You sunk one of my battleships!"
-                board[guess_row][guess_col] = "X"
-                board_pc[guess_row][guess_col] = "O"
-                print_board(board)
-            elif ships_left == 0:
-                print "Congratulations! You sunk all of my battleships!"
-                board[guess_row][guess_col] = "X"
-                print_board(board)
-                break
-        else:
-            print "You missed my battleships!"
-            board[guess_row][guess_col] = "O"
-            print_board(board)
+        hit_or_miss()
 
-if turn == n_turns:
+# looping through the turns
+while turn < n_turns and ships_left > 0:
+    print_turn()
+    request_guess()
+    check_guess()
+
+# ending the game
+if ships_left == 0:
+    print "Congratulations! You sunk all of my battleships!"
+    board[guess_row][guess_col] = "X"
+    print_board(board)
+elif turn == n_turns:
     print ""
     print ">>>>>>>>>> GAME OVER <<<<<<<<<<"
     print_board(board_pc)
