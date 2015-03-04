@@ -13,7 +13,7 @@ while n_ships >= n_rows * n_cols or n_ships <= 0:
 
 # calculating the number of turns
 n_fields = n_rows * n_cols
-n_turns = int(ceil(((float(n_ships) / float(n_fields - 1)) ** 0.5) * n_fields)
+n_turns = int(ceil(((float(n_ships) / float(n_fields - 1)) ** 0.5) * n_fields))
 
 # generating the board
 board = []
