@@ -12,7 +12,8 @@ while n_ships >= n_rows * n_cols or n_ships <= 0:
     n_ships = int(raw_input("Number of battleships (1 - %s):" % ((n_rows * n_cols) - 1)))
 
 # calculating the number of turns
-n_turns = int(ceil(((float(n_ships) / float((n_rows * n_cols) - 1)) ** 0.5) * (n_rows * n_cols)))
+n_fields = n_rows * n_cols
+n_turns = int(ceil(((float(n_ships) / float(n_fields - 1)) ** 0.5) * n_fields)
 
 # generating the board
 board = []
