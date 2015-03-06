@@ -68,9 +68,13 @@ def print_turn():
 
 def request_guess():
     global guess_row
+    guess_row = -1
     global guess_col
-    guess_row = int(raw_input("Guess Row (1 - %s):" % (n_rows))) - 1
-    guess_col = int(raw_input("Guess Col (1 - %s):" % (n_cols))) - 1
+    guess_col = -1
+    while guess_row not in row_range:
+        guess_row = int(raw_input("Guess Row (1 - %s):" % (n_rows))) - 1
+    while guess_col not in col_range:
+        guess_col = int(raw_input("Guess Col (1 - %s):" % (n_cols))) - 1
 
 def hit_or_miss():
     if (board_pc[guess_row][guess_col] == "X"):
@@ -87,11 +91,7 @@ def hit_or_miss():
         print_board(board)
 
 def check_guess():
-    if (guess_row not in row_range)\
-    or (guess_col not in col_range):
-        print "Oops, that's not even in the ocean."
-    elif (board[guess_row][guess_col] == "O")\
-    or (board[guess_row][guess_col] == "X"):
+    if (board[guess_row][guess_col] == "O") or (board[guess_row][guess_col] == "X"):
         print "You guessed that one already."
     else:
         global turn
