@@ -57,9 +57,14 @@ turn = 0
 
 ships_left = n_ships
 
+markings_l = ">>>>>>>>>>>>>>>>>>>>"
+markings_r = "<<<<<<<<<<<<<<<<<<<<"
+
 def print_turn():
     print ""
-    print ">>>>>>>>>> Turn %s <<<<<<<<<<" % (turn + 1)
+    print markings_l,
+    print " Turn %s " % (turn + 1),
+    print markings_r
 
 def request_guess():
     global guess_row
@@ -106,5 +111,7 @@ if ships_left == 0:
     print_board(board)
 elif turn == n_turns:
     print ""
-    print ">>>>>>>>>> GAME OVER <<<<<<<<<<"
+    print markings_l,
+    print " GAME OVER ",
+    print markings_r
     print_board(board_pc)
