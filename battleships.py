@@ -76,15 +76,21 @@ def request_guess():
     while guess_col not in col_range:
         guess_col = int(raw_input("Guess Col (1 - %s):" % (n_cols))) - 1
 
+def check_last_ship():
+    if ships_left > 0:
+        print "You sunk one of my battleships!"
+        board[guess_row][guess_col] = "X"
+        board_pc[guess_row][guess_col] = "O"
+    elif ships_left == 0:
+        print "Congratulations! You sunk all of my battleships!"
+        board[guess_row][guess_col] = "X"
+    print_board(board)
+
 def hit_or_miss():
     if (board_pc[guess_row][guess_col] == "X"):
         global ships_left
         ships_left -= 1
-        if ships_left > 0:
-            print "You sunk one of my battleships!"
-            board[guess_row][guess_col] = "X"
-            board_pc[guess_row][guess_col] = "O"
-            print_board(board)
+        check_last_ship()
     else:
         print "You missed my battleships!"
         board[guess_row][guess_col] = "O"
@@ -104,12 +110,8 @@ while turn < n_turns and ships_left > 0:
     request_guess()
     check_guess()
 
-# check for success or failure
-if ships_left == 0:
-    print "Congratulations! You sunk all of my battleships!"
-    board[guess_row][guess_col] = "X"
-    print_board(board)
-elif turn == n_turns:
+# game over?
+if turn == n_turns and ships_left > 0:
     print ""
     print markings_l,
     print " GAME OVER ",
