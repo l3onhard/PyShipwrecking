@@ -2,6 +2,10 @@
 from random import randint
 from math import ceil
 
+# some style stuff
+markings_l = ">>>>>>>>>>>>>>>>>>>>"
+markings_r = "<<<<<<<<<<<<<<<<<<<<"
+
 # let the player choose the size of the board
 n_rows = int(raw_input("Number of rows:"))
 n_cols = int(raw_input("Number of columns:"))
@@ -24,19 +28,14 @@ for x in row_range:
     board.append(["#"] * n_cols)
     
 def print_board(board):
-    print "~~~~~~~~~~"
+    print "~~~~~~~~~~~~~~~~~~~~~~~~~~"
     for row in board:
         print " ".join(row)
-    print "~~~~~~~~~~"
+    print "~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
 board_pc = []
 for x in row_range:
     board_pc.append(["#"] * n_cols)
-
-# begin the game
-print "Let's play Battleship!"
-print "You have %s turns." % (n_turns)
-print_board(board)
 
 # generate the ships
 def random_row(board_range):
@@ -57,8 +56,13 @@ turn = 0
 
 ships_left = n_ships
 
-markings_l = ">>>>>>>>>>>>>>>>>>>>"
-markings_r = "<<<<<<<<<<<<<<<<<<<<"
+def print_begin_game():
+    print ""
+    print markings_l,
+    print "Let's play Battleship!",
+    print markings_r
+    print "You have %s turns." % (n_turns)
+    print_board(board)
 
 def print_turn():
     print ""
@@ -86,7 +90,7 @@ def check_last_ship():
         board[guess_row][guess_col] = "X"
     print_board(board)
 
-def hit_or_miss():
+def check_hit_miss():
     if (board_pc[guess_row][guess_col] == "X"):
         global ships_left
         ships_left -= 1
@@ -96,21 +100,24 @@ def hit_or_miss():
         board[guess_row][guess_col] = "O"
         print_board(board)
 
-def check_guess():
+def check_guess_history():
     if (board[guess_row][guess_col] == "O") or (board[guess_row][guess_col] == "X"):
         print "You guessed that one already."
     else:
         global turn
         turn += 1
-        hit_or_miss()
+        check_hit_miss()
 
-# loop through the turns
+# game
+print_begin_game()
+
+    # loop through the turns
 while turn < n_turns and ships_left > 0:
     print_turn()
     request_guess()
-    check_guess()
+    check_guess_history()
 
-# game over?
+    # game over?
 if turn == n_turns and ships_left > 0:
     print ""
     print markings_l,
