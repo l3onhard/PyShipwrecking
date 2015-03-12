@@ -38,31 +38,33 @@ board_pc = []
 for x in row_range:
     board_pc.append(["#"] * n_cols)
 
-# generate the ships
-def random_row(board_range):
-    return randint(0, len(row_range) - 1)
-def random_col(board_range):
-    return randint(0, len(col_range) - 1)
+# define game-play objects and functions
 
-for ship in range(n_ships):
-    ship_row = random_row(row_range)
-    ship_col = random_col(col_range)
-    while board_pc[ship_row][ship_col] == "X" or board_pc[ship_row][ship_col] == "%":
-        ship_row = random_row(row_range)
-        ship_col = random_col(col_range)
-    board_pc[ship_row][ship_col] = "X"
-
+def ship_spacing(board, row, col, string):
     ship_space = [[-1, 0, 1, 1, 1, 0, -1, -1], [1, 1, 1, 0, -1, -1, -1, 0]]
-
     for i in range(8):
-        ship_space[0][i] = ship_row + ship_space[0][i]
-        ship_space[1][i] = ship_col + ship_space[1][i]
-
+        ship_space[0][i] = row + ship_space[0][i]
+        ship_space[1][i] = col + ship_space[1][i]
     for i in range(8):
         if (ship_space[0][i] in row_range) and (ship_space[1][i] in col_range):
-            board_pc[ship_space[0][i]][ship_space[1][i]] = "%"
+            board[ship_space[0][i]][ship_space[1][i]] = string
 
-# define game-play objects and functions
+    # generate the ships
+def place_ships_on_board():
+    global row_range, col_range, board_pc
+    def random_row(board_range):
+        return randint(0, len(row_range) - 1)
+    def random_col(board_range):
+        return randint(0, len(col_range) - 1)
+    for ship in range(n_ships):
+        ship_row = random_row(row_range)
+        ship_col = random_col(col_range)
+        while board_pc[ship_row][ship_col] == "X" or board_pc[ship_row][ship_col] == "%":
+            ship_row = random_row(row_range)
+            ship_col = random_col(col_range)
+        board_pc[ship_row][ship_col] = "X"
+        ship_spacing(board_pc, ship_row, ship_col, "%")
+
 turn = 0
 
 ships_left = n_ships
@@ -100,22 +102,13 @@ def check_last_ship():
         print "Congratulations! You sunk all of my battleships!"
         board[guess_row][guess_col] = "X"
 
-def uncover_ship_space():
-    ship_space = [[-1, 0, 1, 1, 1, 0, -1, -1], [1, 1, 1, 0, -1, -1, -1, 0]]
-    for i in range(8):
-        ship_space[0][i] = guess_row + ship_space[0][i]
-        ship_space[1][i] = guess_col + ship_space[1][i]
-    for i in range(8):
-        if (ship_space[0][i] in row_range) and (ship_space[1][i] in col_range):
-            global board
-            board[ship_space[0][i]][ship_space[1][i]] = "O"
-
 def check_hit_miss():
     if (board_pc[guess_row][guess_col] == "X"):
         global ships_left
         ships_left -= 1
         check_last_ship()
-        uncover_ship_space()
+        # Uncover ship space
+        ship_spacing(board, guess_row, guess_col, "O")
         print_board(board)
     else:
         print "You missed my battleships!"
@@ -131,6 +124,8 @@ def check_guess_history():
         check_hit_miss()
 
 # game
+place_ships_on_board()
+
 print_begin_game()
 
     # loop through the turns
