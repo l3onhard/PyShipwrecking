@@ -12,8 +12,9 @@ n_cols = int(raw_input("Number of columns:"))
 
 # let the player choose the number of battleships
 n_ships = 0
-while n_ships >= n_rows * n_cols or n_ships <= 0:
-    n_ships = int(raw_input("Number of battleships (1 - %s):" % ((n_rows * n_cols) - 1)))
+n_ships_max = int(ceil(n_rows * n_cols / 8))
+while n_ships >= (n_ships_max + 1) or n_ships <= 0:
+    n_ships = int(raw_input("Number of battleships (1 - %s):" % n_ships_max))
 
 # calculate the number of turns
 n_fields = n_rows * n_cols
@@ -46,11 +47,22 @@ def random_col(board_range):
 for ship in range(n_ships):
     ship_row = random_row(row_range)
     ship_col = random_col(col_range)
-    while board_pc[ship_row][ship_col] == "X":
+    while board_pc[ship_row][ship_col] == "X" or board_pc[ship_row][ship_col] == "%":
         ship_row = random_row(row_range)
         ship_col = random_col(col_range)
     board_pc[ship_row][ship_col] = "X"
 
+    ship_space = [[-1, 0, 1, 1, 1, 0, -1, -1], [1, 1, 1, 0, -1, -1, -1, 0]]
+
+    for i in range(8):
+        ship_space[0][i] = ship_row + ship_space[0][i]
+        ship_space[1][i] = ship_col + ship_space[1][i]
+
+    for i in range(8):
+        if (ship_space[0][i] in row_range) and (ship_space[1][i] in row_range):
+            board_pc[ship_space[0][i]][ship_space[1][i]] = "%"
+
+print_board(board_pc)
 # define game-play objects and functions
 turn = 0
 
