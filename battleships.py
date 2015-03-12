@@ -59,10 +59,9 @@ for ship in range(n_ships):
         ship_space[1][i] = ship_col + ship_space[1][i]
 
     for i in range(8):
-        if (ship_space[0][i] in row_range) and (ship_space[1][i] in row_range):
+        if (ship_space[0][i] in row_range) and (ship_space[1][i] in col_range):
             board_pc[ship_space[0][i]][ship_space[1][i]] = "%"
 
-print_board(board_pc)
 # define game-play objects and functions
 turn = 0
 
@@ -100,13 +99,24 @@ def check_last_ship():
     elif ships_left == 0:
         print "Congratulations! You sunk all of my battleships!"
         board[guess_row][guess_col] = "X"
-    print_board(board)
+
+def uncover_ship_space():
+    ship_space = [[-1, 0, 1, 1, 1, 0, -1, -1], [1, 1, 1, 0, -1, -1, -1, 0]]
+    for i in range(8):
+        ship_space[0][i] = guess_row + ship_space[0][i]
+        ship_space[1][i] = guess_col + ship_space[1][i]
+    for i in range(8):
+        if (ship_space[0][i] in row_range) and (ship_space[1][i] in col_range):
+            global board
+            board[ship_space[0][i]][ship_space[1][i]] = "O"
 
 def check_hit_miss():
     if (board_pc[guess_row][guess_col] == "X"):
         global ships_left
         ships_left -= 1
         check_last_ship()
+        uncover_ship_space()
+        print_board(board)
     else:
         print "You missed my battleships!"
         board[guess_row][guess_col] = "O"
