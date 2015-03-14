@@ -7,18 +7,17 @@ markings_l = ">>>>>>>>>>>>>>>>>>>>"
 markings_r = "<<<<<<<<<<<<<<<<<<<<"
 
 # let the player choose the size of the board
-n_rows = int(raw_input("Number of rows:"))
-n_cols = int(raw_input("Number of columns:"))
+n_rows = -1
+while n_rows < 3 or n_rows > 10:
+    n_rows = int(raw_input("\nHow big do you want the square board to be? \nChoose the number of rows (3 - 10):"))
+n_cols = n_rows
 
-# let the player choose the number of battleships
-n_ships = 0
-n_ships_max = int(ceil(n_rows * n_cols / 8))
-while n_ships >= (n_ships_max + 1) or n_ships <= 0:
-    n_ships = int(raw_input("Number of battleships (1 - %s):" % n_ships_max))
+# calculate the number of battleships
+n_ships = int(ceil(n_rows * n_cols / 8))
 
 # calculate the number of turns
 n_fields = n_rows * n_cols
-n_turns = int(ceil(((float(n_ships) / float(n_fields - 1)) ** 0.5) * n_fields))
+n_turns = int(ceil(((float(n_ships) / float(n_fields - 1)) ** 0.5) * n_fields * (10 + n_rows) / 10))
 
 # generate the board
 board = []
@@ -75,12 +74,15 @@ def print_begin_game():
     print "Let's play Battleship!",
     print markings_r
     print "You have %s turns." % (n_turns)
+    print "There are %s ships." % (n_ships)
     print_board(board)
 
 def print_turn():
-    print ""
+    print "\n"
     print markings_l,
     print " Turn %s " % (turn + 1),
+    if turn + 1 == n_turns:
+        print "(Last!)",
     print markings_r
 
 def request_guess():
@@ -95,11 +97,11 @@ def request_guess():
 
 def check_last_ship():
     if ships_left > 0:
-        print "You sunk one of my battleships!"
+        print "\nYou sunk one of my battleships!"
         board[guess_row][guess_col] = "X"
         board_pc[guess_row][guess_col] = "O"
     elif ships_left == 0:
-        print "Congratulations! You sunk all of my battleships!"
+        print "\nCongratulations! You sunk all of my battleships!"
         board[guess_row][guess_col] = "X"
 
 def check_hit_miss():
@@ -111,13 +113,13 @@ def check_hit_miss():
         ship_spacing(board, guess_row, guess_col, "O")
         print_board(board)
     else:
-        print "You missed my battleships!"
+        print "\nYou missed my battleships!"
         board[guess_row][guess_col] = "O"
         print_board(board)
 
 def check_guess_history():
     if (board[guess_row][guess_col] == "O") or (board[guess_row][guess_col] == "X"):
-        print "You guessed that one already."
+        print "\nYou guessed that one already."
     else:
         global turn
         turn += 1
