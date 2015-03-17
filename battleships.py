@@ -9,15 +9,15 @@ markings_r = "<<<<<<<<<<<<<<<<<<<<"
 # let the player choose the size of the board
 n_rows = -1
 while n_rows < 3 or n_rows > 10:
-    n_rows = int(raw_input("\nHow big do you want the square board to be? \nChoose the number of rows (3 - 10):"))
+    n_rows = int(input("\nHow big do you want the square board to be? \nChoose the number of rows (3 - 10):"))
 n_cols = n_rows
 
 # calculate the number of battleships
-n_ships = int(ceil(n_rows * n_cols / 8))
+n_ships = ceil(n_rows * n_cols / 8)
 
 # calculate the number of turns
 n_fields = n_rows * n_cols
-n_turns = int(ceil(((float(n_ships) / float(n_fields - 1)) ** 0.5) * n_fields * (10 + n_rows) / 10))
+n_turns = ceil(((n_ships / (n_fields - 1)) ** 0.5) * n_fields * (10 + n_rows) / 10)
 
 # generate the board
 board = []
@@ -28,10 +28,10 @@ for x in row_range:
     board.append(["#"] * n_cols)
     
 def print_board(board):
-    print "~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
     for row in board:
-        print " ".join(row)
-    print "~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        print(" ".join(row))
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
 board_pc = []
 for x in row_range:
@@ -69,21 +69,19 @@ turn = 0
 ships_left = n_ships
 
 def print_begin_game():
-    print ""
-    print markings_l,
-    print "Let's play Battleship!",
-    print markings_r
-    print "You have %s turns." % (n_turns)
-    print "There are %s ships." % (n_ships)
+    print("")
+    print(markings_l, "Let's play Battleship!", markings_r)
+    print("You have %s turns." % (n_turns))
+    print("There are %s ships." % (n_ships))
     print_board(board)
 
 def print_turn():
-    print "\n"
-    print markings_l,
-    print " Turn %s " % (turn + 1),
     if turn + 1 == n_turns:
-        print "(Last!)",
-    print markings_r
+        is_last = "(Last!) "
+    else:
+        is_last = ""
+    print("\n")
+    print(markings_l, " Turn %s " % (turn + 1), is_last, markings_r)
 
 def request_guess():
     global guess_row
@@ -91,17 +89,17 @@ def request_guess():
     global guess_col
     guess_col = -1
     while guess_row not in row_range:
-        guess_row = int(raw_input("Guess Row (1 - %s):" % (n_rows))) - 1
+        guess_row = int(input("Guess Row (1 - %s):" % (n_rows))) - 1
     while guess_col not in col_range:
-        guess_col = int(raw_input("Guess Col (1 - %s):" % (n_cols))) - 1
+        guess_col = int(input("Guess Col (1 - %s):" % (n_cols))) - 1
 
 def check_last_ship():
     if ships_left > 0:
-        print "\nYou sunk one of my battleships!"
+        print("\nYou sunk one of my battleships!")
         board[guess_row][guess_col] = "X"
         board_pc[guess_row][guess_col] = "O"
     elif ships_left == 0:
-        print "\nCongratulations! You sunk all of my battleships!"
+        print("\nCongratulations! You sunk all of my battleships!")
         board[guess_row][guess_col] = "X"
 
 def check_hit_miss():
@@ -113,19 +111,19 @@ def check_hit_miss():
         ship_spacing(board, guess_row, guess_col, "O")
         print_board(board)
     else:
-        print "\nYou missed my battleships!"
+        print("\nYou missed my battleships!")
         board[guess_row][guess_col] = "O"
         print_board(board)
 
 def check_guess_history():
     if (board[guess_row][guess_col] == "O") or (board[guess_row][guess_col] == "X"):
-        print "\nYou guessed that one already."
+        print("\nYou guessed that one already.")
     else:
         global turn
         turn += 1
         check_hit_miss()
 
-# game
+############################## GAME EXECUTION #################################
 place_ships_on_board()
 
 print_begin_game()
@@ -138,8 +136,6 @@ while turn < n_turns and ships_left > 0:
 
     # game over?
 if turn == n_turns and ships_left > 0:
-    print ""
-    print markings_l,
-    print " GAME OVER ",
-    print markings_r
+    print("")
+    print(markings_l, " GAME OVER ", markings_r)
     print_board(board_pc)
