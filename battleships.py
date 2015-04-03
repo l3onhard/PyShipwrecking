@@ -8,124 +8,143 @@ def print_welcome():
     print("###################################################################")
     print("#####                 Welcome to Battleships!                 #####")
     print("###################################################################")
-    print("""\nYou stumble upon a perfectly square ocean. """)
+    print("""\n\tIn this game you have to try to sink all of the battleships 
+\tthat were randomly placed by the computer in an ocean.\n""")
 
-
-def player_chooses_board_size(): # player chooses the size of the square board (i.e. the number of rows)
-    global nRows, nCols, rangeRow, rangeCol
-    print("""\nIn this game you have to try to sink all of my battleships. 
-My ships are hidden in a perfectly square ocean. 
-How long do you want one side of this ocean to be?\n""")
+def player_chooses_number_of_ships(): 
+    ''' 
+    The player is asked to choose the number of battleships, 
+    she/he will have to sink. 
+    '''
     while True:
-        nRows = int(input("\tChoose a number (3 - 9):"))
-        if nRows >= 3 and nRows <= 9:
+        nShips = int(input("Choose the number of ships placed by the computer (1 - 7): "))
+        if (nShips >= 1) and (nShips <= 7):
             break
-    nCols = nRows
-    rangeRow = range(nRows)
-    rangeCol = range(nCols)
+    return nShips
 
-def create_boards(): # creates two boards (one visible and the other invisible to the player)
-    global boardVisib, boardInvis
-    boardVisib = []
-    for x in rangeRow:
-        boardVisib.append(["#"] * nCols)
-    boardInvis = []
-    for x in rangeRow:
-        boardInvis.append(["#"] * nCols)
+def calculate_size_of_board(nShips): 
+    '''
+    Calculate the number of rows ("nRows") of the board 
+    form the number of ships ("nShips").
+    '''
+    nFields = nShips * 8
+    nRows = ceil(nFields ** 0.5)
+    return nRows
 
-def calculate_size_of_board(): # calculate the number of battleships
-    global nShips, nShipsLeft
-    nShips = ceil(nRows * nCols / 8)
-    nShipsLeft = ceil(nRows * nCols / 8)
+def create_board(nRows, nCols):
+    '''
+    Create a board ("board") according to the number of rows ("nRows") 
+    and columns ("nCols").
+    '''
+    board = []
+    for x in range(nRows):
+        board.append(["#"] * nCols)
+    return board
 
-def calculate_number_of_turns():
-    global nTurns, currentTurn
+def calculate_number_of_turns(nRows, nCols, nShips):
     nFields = nRows * nCols
     nTurns = ceil(((nShips / (nFields - 1)) ** 0.5) * nFields * (10 + nRows) / 10)
-    currentTurn = 1
+    return nTurns
 
-def place_ships_on_board_invis():
-    global rangeRow, rangeCol, boardInvis
+def place_ships_on_board_invis(nShips, nRows, nCols, boardInvis):
+    bI, nR, nC = boardInvis, nRows, nCols
+
     def randomFromRange(range):
         return randint(0, len(range) - 1)
     for ship in range(nShips):
-        shipRow = randomFromRange(rangeRow)
-        shipCol = randomFromRange(rangeCol)
-        while boardInvis[shipRow][shipCol] == "X" or boardInvis[shipRow][shipCol] == "%":
-            shipRow = randomFromRange(rangeRow)
-            shipCol = randomFromRange(rangeCol)
+        shipRow = randomFromRange(range(nRows))
+        shipCol = randomFromRange(range(nCols))
+        while (boardInvis[shipRow][shipCol] == "X") or (boardInvis[shipRow][shipCol] == "%"):
+            shipRow = randomFromRange(range(nRows))
+            shipCol = randomFromRange(range(nCols))
         boardInvis[shipRow][shipCol] = "X"
-        add_space_around_ships(board = boardInvis, row = shipRow, col = shipCol, symbol = "%")
+        add_space_around_ships(board = bI, row = shipRow, col = shipCol, symbol = "%", nRows = nR, nCols = nC)
 
-def print_begin_game():
+def print_begin_game(boardVisib, nTurns, nShips):
+    bV = boardVisib
+
     print_title("   Let's play!   ")
     print("You have %s turns." % (nTurns))
     print("There are %s ships hiding in the ocean.\n" % (nShips))
-    print_board(boardVisib)
+    print_board(board = bV)
 
-def print_turn():
+def print_turn(currentTurn, nTurns):
     print_title(title = (" Turn %s out of %s " % (currentTurn, nTurns)))
 
-def player_guesses():
-    global guessRow
-    guessRow = -1
-    global guessCol
-    guessCol = -1
-    while guessRow not in rangeRow:
+def player_guesses(nRows, nCols):
+    guessRow, guessCol = -1, -1
+    while guessRow not in range(nRows):
         guessRow = int(input("\tGuess Row (1 - %s):" % (nRows))) - 1
-    while guessCol not in rangeCol:
+    while guessCol not in range(nCols):
         guessCol = int(input("\tGuess Col (1 - %s):" % (nCols))) - 1
+    return (guessRow, guessCol)
 
-def check_guessed_already():
-    global guessedAlready
+def check_guessed_already(guessRow, guessCol, boardVisib):
     if (boardVisib[guessRow][guessCol] == "O") or (boardVisib[guessRow][guessCol] == "X"):
         guessedAlready = True
         print("\nYou guessed that one already.")
     else:
         guessedAlready = False
+    return guessedAlready
 
-def check_hit_or_miss():
+def check_hit_or_miss(nShipsLeft, guessRow, guessCol, boardInvis, boardVisib, nRows, nCols):
+    bV, bI, gR, gC, nR, nC = boardVisib, boardInvis, guessRow, guessCol, nRows, nCols
+
     if (boardInvis[guessRow][guessCol] == "X"): # Hit
-        global nShipsLeft
+        shipHit = True
+
         nShipsLeft -= 1
         if nShipsLeft > 0:
             print("\nYou sank one of my battleships!")
-        edit_boards(trigger = 'Hit')
+        edit_boards(trigger = 'Hit', boardVisib = bV, boardInvis = bI, guessRow = gR, guessCol = gC, nRows = nR, nCols = nC)
+    
     else:
+        shipHit = False
+
         print("\nYou missed my battleships!")
-        edit_boards(trigger = 'Miss')
+        edit_boards(trigger = 'Miss', boardVisib = bV, boardInvis = bI, guessRow = gR, guessCol = gC, nRows = nR, nCols = nC)
 
-def calculate_next_turn_number():
-    global currentTurn
+    return shipHit
+
+def calculate_next_turn_number(currentTurn):
     currentTurn += 1
+    return currentTurn
 
-def check_win_or_lose(): # Have all ships been sunken?
+def check_win_or_lose(nShipsLeft, boardVisib, boardInvis, guessRow, guessCol, nRows, nCols):
+    bV, bI, gR, gC, nR, nC = boardVisib, boardInvis, guessRow, guessCol, nRows, nCols
+    '''
+    Check whether all ships have been sunken.
+    '''
     if nShipsLeft > 0: # Lose
         print_title("    GAME OVER    ")
         if nShipsLeft == 1:
             print("\nThere is one survivor:")
         else:
             print("\nThere are a few survivors:")
-        edit_boards(trigger = 'GameOver') # edit the invisible board before showing it to the player
-        print_board(boardInvis)
+
+        # edit the invisible board before showing it to the player
+        edit_boards(trigger = 'GameOver', boardVisib = bV, boardInvis = bI, guessRow = gR, guessCol = gC, nRows = nR, nCols = nC)
+
+        print_board(board = bI)
     elif nShipsLeft == 0: # Win
         print_title("     YOU WON!     ")
         print("Congratulations! You sank all of my battleships!\n\n")
 
 def player_wants_to_play_again():
+    print("\n###################################################################")
     while True:
-        playerInput = input("\tDo you want to play again? (yes or no?):").lower()
-        if playerInput == "yes" or playerInput == "y":
+        playerInput = input("\n\nDo you want to play again? (yes or no?):").lower()
+        if (playerInput == "yes") or (playerInput == "y"):
             return True
             break
-        elif playerInput == "no" or playerInput == "n":
+        elif (playerInput == "no") or (playerInput == "n"):
             return False
             break
 
 # define helper functions
 
 def print_title(title):
-    print("\n>>>>>>>>>>>>>>>>", title, "<<<<<<<<<<<<<<<<")
+    print("\n\n>>>>>>>>>>>>>>>>", title, "<<<<<<<<<<<<<<<<")
 
 def print_board(board):
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
@@ -133,58 +152,93 @@ def print_board(board):
         print(" ".join(row))
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
-def add_space_around_ships(board, row, col, symbol): # inserts a "symbol" in all fields that boarder the ship (located with "row" and "col")
+def add_space_around_ships(board, row, col, symbol, nRows, nCols):
+    '''
+    Insert a "symbol" in all fields that boarder the ship. 
+    The ship is located with "row" and "col".
+    '''
     shipSpace = [[-1, 0, 1, 1, 1, 0, -1, -1], [1, 1, 1, 0, -1, -1, -1, 0]]
+
     for i in range(8):
         shipSpace[0][i] = row + shipSpace[0][i]
         shipSpace[1][i] = col + shipSpace[1][i]
+
     for i in range(8):
-        if (shipSpace[0][i] in rangeRow) and (shipSpace[1][i] in rangeCol):
+        if (shipSpace[0][i] in range(nRows)) and (shipSpace[1][i] in range(nCols)):
             board[shipSpace[0][i]][shipSpace[1][i]] = symbol
 
-def edit_boards(trigger): 
+def edit_boards(trigger, boardVisib, boardInvis, guessRow, guessCol, nRows, nCols):
+    bV, gR, gC, nR, nC = boardVisib, guessRow, guessCol, nRows, nCols
+
     if trigger == 'Hit':
         boardVisib[guessRow][guessCol] = "X"
         boardInvis[guessRow][guessCol] = "O"
         # Uncover the fields on the visible board that boarder the sunken ship
-        add_space_around_ships(board = boardVisib, row = guessRow, col = guessCol, symbol = "O")
+        add_space_around_ships(board = bV, row = gR, col = gC, symbol = "O", nRows = nR, nCols = nC)
+
     elif trigger == 'Miss':
         boardVisib[guessRow][guessCol] = "O"
         boardInvis[guessRow][guessCol] = "O"
+
     elif trigger == 'GameOver':   
-        for row in rangeRow:
-            for col in rangeCol:
-                if boardInvis[row][col] == "%" or boardInvis[row][col] == "#":
+        for row in range(nRows):
+            for col in range(nCols):
+                if (boardInvis[row][col] == "%") or (boardInvis[row][col] == "#"):
                     boardInvis[row][col] = "O"
-# define the game
 
-def runGame():
+# define the game execution
+
+def run_game():
+
     print_welcome()
-    player_chooses_board_size()
-    create_boards()
-    calculate_size_of_board()
-    calculate_number_of_turns()
-    place_ships_on_board_invis()
-    print_begin_game()
 
-        # loop through the turns
-    while currentTurn <= nTurns and nShipsLeft > 0:
-        print_turn()
+    nShips = player_chooses_number_of_ships()
+    nShipsLeft = nShips
+
+    nRows = calculate_size_of_board(nShips)
+    nCols = nRows
+
+    # create two boards; one visible and one invisible to the player
+    boardVisib, boardInvis = create_board(nRows, nCols), create_board(nRows, nCols)
+
+    nTurns = calculate_number_of_turns(nRows,nCols, nShips)
+    currentTurn = 1
+
+    place_ships_on_board_invis(nShips, nRows, nCols, boardInvis)
+
+    print_begin_game(boardVisib, nTurns, nShips)
+
+    while (currentTurn <= nTurns) and (nShipsLeft > 0):
+        '''
+        Loop through each turn.
+        '''
+        print_turn(currentTurn, nTurns)
+
         while True:
-            player_guesses()
-            check_guessed_already()
+
+            guessRow, guessCol = player_guesses(nRows, nCols)
+
+            guessedAlready = check_guessed_already(guessRow, guessCol, boardVisib)
             if not guessedAlready:
                 break
-        check_hit_or_miss()
-        print_board(boardVisib)
-        calculate_next_turn_number()
 
-    check_win_or_lose()
+        shipHit = check_hit_or_miss(nShipsLeft, guessRow, guessCol, boardInvis, boardVisib, nRows, nCols)
+        if shipHit:
+            nShipsLeft -= 1
+
+        print_board(boardVisib)
+
+        currentTurn = calculate_next_turn_number(currentTurn)
+
+    check_win_or_lose(nShipsLeft, boardVisib, boardInvis, guessRow, guessCol, nRows, nCols)
   
 
 ############################## GAME EXECUTION #################################
+
 while True:
-    runGame()
+
+    run_game()
+
     playAgain = player_wants_to_play_again()
     if playAgain == False:
         break
