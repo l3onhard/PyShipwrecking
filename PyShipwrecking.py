@@ -6,18 +6,19 @@ from math import ceil
 def print_welcome():
     print("\n\n\n\n")
     print("###################################################################")
-    print("#####                 Welcome to Battleships!                 #####")
+    print("#####                 Welcome to PyShipwrecking!              #####")
     print("###################################################################")
-    print("""\n\tIn this game you have to try to sink all of the battleships 
-\tthat were randomly placed by the computer in an ocean.""")
+    print('''\n\tTo win this game you have to wreck all ships 
+\tthat are hidden in the ocean.''')
 
 def player_chooses_number_of_ships(): 
     ''' 
-    The player is asked to choose the number of battleships, 
-    she/he will have to sink. 
+    The player is asked to choose the number of ships, 
+    she/he will have to wreck. 
     '''
+    print('\n\tHow many ships do you want to destroy?')
     while True:
-        nShips = int(input("\n\tChoose the number of ships (1 - 7): "))
+        nShips = int(input("\t(1 - 7): "))
         if (nShips >= 1) and (nShips <= 7):
             break
     return nShips
@@ -63,7 +64,7 @@ def place_ships_on_board_invis(nShips, nRows, nCols, boardInvis):
 
 def print_begin_game(boardVisib, nTurns, nShips, nRows):
 
-    print_title("   Let's play!   ")
+    print_title("  Start wrecking!  ")
     print("\n\tYou have %s turns." % (nTurns))
     if nShips == 1:
         print("\tThere is 1 ship hiding in the ocean.")
@@ -86,7 +87,7 @@ def player_guesses(nRows, nCols):
 def check_guessed_already(guessRow, guessCol, boardVisib):
     if (boardVisib[guessRow][guessCol] == "O") or (boardVisib[guessRow][guessCol] == "X"):
         guessedAlready = True
-        print("\n\tYou guessed that one already. Try again:")
+        print("\n\tYou have guessed that one already. Try again:")
     else:
         guessedAlready = False
     return guessedAlready
@@ -98,7 +99,7 @@ def check_hit_or_miss(nShipsLeft, guessRow, guessCol, boardInvis, boardVisib, nR
 
         nShipsLeft -= 1
         if nShipsLeft > 0:
-            print("\n\tYou sank one of the battleships!")
+            print("\n\tYou wrecked one of the ships!")
         edit_boards(trigger = 'Hit',
                     boardVISIB = boardVisib, boardINVIS = boardInvis, 
                     guessROW = guessRow, guessCOL = guessCol, 
@@ -121,14 +122,14 @@ def calculate_next_turn_number(currentTurn):
 
 def check_win_or_lose(nShipsLeft, boardVisib, boardInvis, guessRow, guessCol, nRows, nCols):
     '''
-    Check whether all ships have been sunken.
+    Check whether all ships have been wrecked.
     '''
     if nShipsLeft > 0: # Lose
         print_title("    GAME OVER    ")
         if nShipsLeft == 1:
-            print("\n\tThere is one surviving ship:")
+            print("\n\tThere is one UNwrecked ship left:")
         else:
-            print("\n\tThere are a few surviving ships:")
+            print("\n\tThere are a few UNwrecked ships left:")
 
         # edit the invisible board before showing it to the player
         edit_boards(trigger = 'GameOver', 
@@ -139,7 +140,7 @@ def check_win_or_lose(nShipsLeft, boardVisib, boardInvis, guessRow, guessCol, nR
         print_board(boardInvis)
     elif nShipsLeft == 0: # Win
         print_title("     YOU WON!     ")
-        print("\n\tCongratulations! You sank all battleships!\n\n")
+        print("\n\tCongratulations! You wrecked all of the ships!\n\n")
 
 def player_wants_to_play_again():
     print("\n###################################################################")
@@ -184,7 +185,7 @@ def edit_boards(trigger, boardVISIB, boardINVIS, guessROW, guessCOL, nROWS, nCOL
     if trigger == 'Hit':
         boardVISIB[guessROW][guessCOL] = "X"
         boardINVIS[guessROW][guessCOL] = "O"
-        # Uncover the fields on the visible board that boarder the sunken ship
+        # Uncover the fields on the visible board that boarder the wrecked ship
         add_space_around_ships(board = boardVISIB, symbol = "O", 
                                row = guessROW, col = guessCOL,
                                nROWS = nROWS, nCOLS = nCOLS)
